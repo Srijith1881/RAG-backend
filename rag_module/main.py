@@ -1,11 +1,25 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from rag_module.rag_chain import get_vectorstore, create_chain_from_retriever
-from rag_module.metrics_client import send_metrics
 import os, time, uuid, traceback
 
+from rag_module.rag_chain import get_vectorstore, create_chain_from_retriever
+from rag_module.metrics_client import send_metrics
+from aws_service.query_log_handler import log_query
+
+
+# ✅ Rate limiting
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
+
+limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,16 +28,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
+
 @app.post("/query")
+@limiter.limit("10/minute")
 async def query(request: Request):
     try:
         data = await request.json()
         question = data.get("query", "").strip()
+        file_id = data.get("file_key")
+
 
         if not question:
             raise HTTPException(status_code=400, detail="Empty query.")
 
-        # ✅ Load vector store and retrieve
         vectorstore = get_vectorstore()
         retriever = vectorstore.as_retriever()
         chain = create_chain_from_retriever(retriever)
@@ -33,7 +53,22 @@ async def query(request: Request):
         result = chain.invoke(question)
         latency = time.time() - start
 
-        send_metrics(run_id, tokens_used=345, confidence=0.92, response_time=latency)
+        send_metrics(
+            run_id=run_id,
+            tokens_used=345,
+            confidence=0.92,
+            response_time=latency,
+            file_id=file_id
+        )
+
+        log_query(
+            run_id=run_id,
+            query_text=question,
+            response_text=result,
+            confidence_score=0.92,
+            file_id=file_id
+        )
+
 
         return {"run_id": run_id, "reply": result}
 

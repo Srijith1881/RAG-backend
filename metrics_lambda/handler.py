@@ -6,13 +6,20 @@ from dotenv import load_dotenv
 import botocore.exceptions
 
 load_dotenv()
-
 dynamodb = boto3.resource(
     "dynamodb",
     region_name=os.getenv("REGION"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
+
+'''dynamodb = boto3.resource(
+    "dynamodb",
+    endpoint_url="http://localhost:4566",
+    region_name=os.getenv("REGION"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)'''
 
 def lambda_handler(event, context):
     try:
@@ -27,7 +34,8 @@ def lambda_handler(event, context):
             "run_id": body["run_id"],
             "tokens_used": body["tokens_used"],
             "confidence_score": Decimal(str(body["confidence_score"])),
-            "response_time": Decimal(str(body["response_time"]))
+            "response_time": Decimal(str(body["response_time"])),
+            "file_id": body.get("file_id", "unknown")
         }
 
         table.put_item(Item=item)

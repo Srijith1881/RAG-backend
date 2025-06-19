@@ -11,6 +11,13 @@ dynamodb = boto3.resource(
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
+'''dynamodb = boto3.resource(
+    "dynamodb",
+    endpoint_url="http://localhost:4566",
+    region_name=os.getenv("REGION"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)'''
 
 table = dynamodb.Table("PDF_Metadata")
 

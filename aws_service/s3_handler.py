@@ -2,17 +2,26 @@ import boto3
 import botocore
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
+
 
 s3 = boto3.client(
     "s3",
-    region_name=os.getenv("REGION", "ap-south-1"),
+    region_name=os.getenv("REGION"),
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
+)
+bucket = "srbucket1881"
+
+'''s3 = boto3.client(
+    "s3",
+    endpoint_url="http://localhost:4566",
+    region_name=os.getenv("REGION"),
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
 )
 
-bucket = "srbucket1881"
+bucket = "pdf-storage"'''
 
 def upload_to_s3(file_path, key):
     try:
