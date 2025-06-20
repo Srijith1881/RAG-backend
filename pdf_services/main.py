@@ -31,7 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Rate limit exception
+# Custom rate limit exception
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
@@ -81,6 +81,7 @@ async def upload_file(request: Request, file: UploadFile = File(...)):
 @app.get("/retrieve/{file_id}")
 @limiter.limit("20/minute")
 def retrieve_file_metadata(request: Request, file_id: str):
+    #Retrieve metadata for a specific file_id from DynamoDB.
     try:
         metadata = get_metadata(file_id)
         if metadata:
@@ -93,6 +94,7 @@ def retrieve_file_metadata(request: Request, file_id: str):
 @app.get("/list")
 @limiter.limit("10/minute")
 def list_files(request: Request, page: int = 1, limit: int = 10):
+    #Paginated list of all uploaded files from DynamoDB.
     try:
         all_items = list_metadata()
         start = (page - 1) * limit

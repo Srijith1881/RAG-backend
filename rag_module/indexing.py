@@ -1,3 +1,6 @@
+
+# Handles chunking and embedding documents using LangChain + ChromaDB.
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings

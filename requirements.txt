@@ -24,3 +24,4 @@ moto
 localstack-client
 awscli
 slowapi
+fitz

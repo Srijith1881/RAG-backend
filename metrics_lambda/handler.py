@@ -1,3 +1,8 @@
+
+'''AWS Lambda handler to receive and store LLM query metrics
+into the LLM_Metrics DynamoDB table. Expects a JSON payload
+with keys like run_id, tokens_used, confidence_score'''
+
 import boto3
 import os
 import json
@@ -22,6 +27,7 @@ dynamodb = boto3.resource(
 )'''
 
 def lambda_handler(event, context):
+    # stores the extracted metric into DynamoDB table
     try:
         table = dynamodb.Table("LLM_Metrics")
 
