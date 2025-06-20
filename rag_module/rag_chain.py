@@ -7,6 +7,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain import hub
+from dotenv import load_dotenv
+load_dotenv()
 
 embedding = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 prompt = hub.pull("rlm/rag-prompt")

@@ -1,4 +1,3 @@
-
 # Exposes a FastAPI endpoint to summarize stored metrics(Total queries,Average response time,Average tokens used)
 
 from fastapi import FastAPI, HTTPException
@@ -7,27 +6,14 @@ import boto3
 from decimal import Decimal
 from boto3.dynamodb.conditions import Key
 import os
+from aws_service.aws_client import get_resource
 
 load_dotenv()
 
 app = FastAPI()
 
-# AWS Production Configuration (COMMENTED)
-# dynamodb = boto3.resource(
-#     "dynamodb",
-#     region_name=os.getenv("REGION"),
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-# )
 
-# LocalStack Configuration
-dynamodb = boto3.resource(
-    "dynamodb",
-    endpoint_url="http://localhost:4566",
-    region_name=os.getenv("REGION", "us-east-1"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "test"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "test")
-)
+dynamodb = get_resource("dynamodb")
 
 @app.get("/metrics/summary")
 def get_metrics_summary():

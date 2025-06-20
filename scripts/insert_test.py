@@ -2,18 +2,13 @@ import boto3
 from decimal import Decimal
 from datetime import datetime
 import json
+from aws_service.aws_client import get_resource
 
 def test_direct_inserts():
     """Test direct insertions to identify the exact issue"""
     
     # Initialize DynamoDB resource
-    dynamodb = boto3.resource(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb = get_resource("dynamodb")
 
     print("🧪 Testing direct insertions to DynamoDB tables...")
 
@@ -138,13 +133,7 @@ def test_problematic_data_types():
         ("Negative", -0.5)
     ]
     
-    dynamodb = boto3.resource(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb = get_resource("dynamodb")
     
     table = dynamodb.Table('QueryLog')
     
@@ -175,13 +164,7 @@ def cleanup_test_data():
     """Clean up test data"""
     print("\n🧹 Cleaning up test data...")
     
-    dynamodb = boto3.resource(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb = get_resource("dynamodb")
     
     # Clean QueryLog
     try:

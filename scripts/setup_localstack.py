@@ -1,6 +1,7 @@
 import boto3
 import time
 from botocore.exceptions import ClientError
+from aws_service.aws_client import get_client, get_resource
 
 def wait_for_localstack():
     """Wait for LocalStack to be fully ready"""
@@ -13,29 +14,11 @@ def setup_localstack_resources():
     wait_for_localstack()
     
     # Initialize clients for LocalStack
-    dynamodb_client = boto3.client(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb_client = get_client("dynamodb")
     
-    dynamodb_resource = boto3.resource(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb_resource = get_resource("dynamodb")
 
-    s3_client = boto3.client(
-        's3',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    s3_client = get_client("s3")
 
     # Check existing tables first
     def check_existing_tables():

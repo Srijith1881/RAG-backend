@@ -3,25 +3,12 @@ from datetime import datetime
 import os
 from decimal import Decimal
 from dotenv import load_dotenv
+from aws_service.aws_client import get_resource
 
 load_dotenv()
 
-# AWS Production Configuration (COMMENTED)
-# dynamodb = boto3.resource(
-#     "dynamodb",
-#     region_name=os.getenv("REGION", "ap-south-1"),
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-# )
 
-# LocalStack Configuration
-dynamodb = boto3.resource(
-    "dynamodb",
-    endpoint_url="http://localhost:4566",
-    region_name=os.getenv("REGION", "us-east-1"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "test"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "test")
-)
+dynamodb = get_resource("dynamodb")
 
 def convert_float_to_decimal(obj):
     """Convert float values to Decimal for DynamoDB compatibility"""

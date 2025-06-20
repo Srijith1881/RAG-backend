@@ -1,4 +1,3 @@
-
 '''AWS Lambda handler to receive and store LLM query metrics
 into the LLM_Metrics DynamoDB table. Expects a JSON payload
 with keys like run_id, tokens_used, confidence_score'''
@@ -9,22 +8,11 @@ import json
 from decimal import Decimal
 from dotenv import load_dotenv
 import botocore.exceptions
+from aws_service.aws_client import get_resource
 
 load_dotenv()
-dynamodb = boto3.resource(
-    "dynamodb",
-    region_name=os.getenv("REGION"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-)
+dynamodb = get_resource("dynamodb")
 
-'''dynamodb = boto3.resource(
-    "dynamodb",
-    endpoint_url="http://localhost:4566",
-    region_name=os.getenv("REGION"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-)'''
 
 def lambda_handler(event, context):
     # stores the extracted metric into DynamoDB table

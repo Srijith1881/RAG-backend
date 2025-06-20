@@ -1,4 +1,3 @@
-
 '''Provides APIs to:
     - Fetch latest query logs
     - Filter logs by file_id
@@ -12,26 +11,13 @@ import csv
 import io
 import json
 from dotenv import load_dotenv
+from aws_service.aws_client import get_resource
 
 load_dotenv()
 app = FastAPI()
 
-# AWS Production Configuration (COMMENTED)
-# dynamodb = boto3.resource(
-#     "dynamodb",
-#     region_name=os.getenv("REGION"),
-#     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-#     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY")
-# )
 
-# LocalStack Configuration
-dynamodb = boto3.resource(
-    "dynamodb",
-    endpoint_url="http://localhost:4566",
-    region_name=os.getenv("REGION", "us-east-1"),
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID", "test"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY", "test")
-)
+dynamodb = get_resource("dynamodb")
 
 @app.get("/query-log")
 def get_query_logs(limit: int = 10):

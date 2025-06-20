@@ -3,34 +3,17 @@ from botocore.exceptions import ClientError
 from decimal import Decimal
 import json
 import time
+from aws_service.aws_client import get_client, get_resource
 
 def verify_localstack_setup():
     """Verify LocalStack resources are properly created and working"""
     
     # Initialize clients
-    dynamodb_client = boto3.client(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb_client = get_client("dynamodb")
     
-    dynamodb_resource = boto3.resource(
-        'dynamodb',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    dynamodb_resource = get_resource("dynamodb")
     
-    s3_client = boto3.client(
-        's3',
-        endpoint_url='http://localhost:4566',
-        region_name='us-east-1',
-        aws_access_key_id='test',
-        aws_secret_access_key='test'
-    )
+    s3_client = get_client("s3")
 
     print("🔍 Verifying LocalStack setup...")
     

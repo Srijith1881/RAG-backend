@@ -1,0 +1,66 @@
+version: '3.8'
+services:
+  localstack:
+    image: localstack/localstack:3.0
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,dynamodb,lambda
+      - DEBUG=1
+      - DATA_DIR=/var/lib/localstack
+      - LAMBDA_EXECUTOR=docker-reuse
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  pdf_service:
+    build: ./pdf_service
+    ports:
+      - "8001:8001"
+    env_file: .env
+    depends_on:
+      - localstack
+    volumes:
+      - ./uploads:/app/uploads
+      - ./chroma_db:/app/chroma_db
+
+  rag_module:
+    build: ./rag_module
+    ports:
+      - "8002:8002"
+    env_file: .env
+    depends_on:
+      - localstack
+    volumes:
+      - ./chroma_db:/app/chroma_db
+
+  aws_service:
+    build: ./aws_service
+    ports:
+      - "8003:8003"
+    env_file: .env
+    depends_on:
+      - localstack
+
+  metrics_summary:
+    build: ./metrics_lambda
+    ports:
+      - "8004:8004"
+    env_file: .env
+    depends_on:
+      - localstack
+    command: ["uvicorn", "metrics_lambda.metrics_summary:app", "--host", "0.0.0.0", "--port", "8004"]
+
+  query_log_api:
+    build: ./metrics_lambda
+    ports:
+      - "8005:8005"
+    env_file: .env
+    depends_on:
+      - localstack
+    command: ["uvicorn", "metrics_lambda.query_log_api:app", "--host", "0.0.0.0", "--port", "8005"]
+
+volumes:
+  localstack_data:
+  chroma_db:
